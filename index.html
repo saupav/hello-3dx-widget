@@ -2,7 +2,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:widget="http://www.netvibes.com/ns/">
 <head>
-  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hello 3DX sample</title>
   <meta name="apiVersion" content="1.0" />
@@ -12,56 +12,165 @@
   <widget:preferences>
     <widget:preference name="greet" type="text" label="Name to greet" defaultValue="" />
   </widget:preferences>
-<style>
-  /* Layout: one card, status strip on top, event log below. Looks like a 3DDashboard widget body. */
-  :root {
-    --bg: #f5f7f9;
-    --panel: #ffffff;
-    --fg: #1d2a35;
-    --muted: #5d6f7f;
-    --line: #d6dee6;
-    --accent: #0a6ed1;
-    --ok: #1f8f4e;
-    --warn: #c77700;
-    --font-ui: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
-    --font-mono: Consolas, "Cascadia Mono", Menlo, monospace;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #141a20; --panel: #1d252d; --fg: #e6ecf1; --muted: #9fb0bf; --line: #324050; --accent: #5aa9f5; --ok: #4fc47f; --warn: #f0a33a; color-scheme: dark;
+  <style type="text/css">
+    /* Layout: status strip on top, panels below, sized for a dashboard tile. */
+    :root {
+      --bg: #f5f7f9; --panel: #ffffff; --fg: #1d2a35; --muted: #5d6f7f; --line: #d6dee6;
+      --accent: #0a6ed1; --ok: #1f8f4e; --warn: #c77700;
+      --font-ui: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+      --font-mono: Consolas, "Cascadia Mono", Menlo, monospace;
     }
-  }
-  :root[data-theme="dark"] {
-    --bg: #141a20; --panel: #1d252d; --fg: #e6ecf1; --muted: #9fb0bf; --line: #324050; --accent: #5aa9f5; --ok: #4fc47f; --warn: #f0a33a; color-scheme: dark;
-  }
-  html, body { height: 100%; }
-  body {
-    background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 14px;
-    padding-block: 12px;
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-  }
-  .wrap { display: flex; flex-direction: column; gap: 12px; max-width: 720px; }
-  h1 { font-size: 18px; margin: 0; text-wrap: balance; }
-  .sub { color: var(--muted); margin: 0; }
-  .status { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pill { border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 12px; background: var(--panel); }
-  .pill b { font-weight: 600; }
-  .pill.ok { border-color: var(--ok); color: var(--ok); }
-  .pill.warn { border-color: var(--warn); color: var(--warn); }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px; min-width: 0; }
-  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-  input[type=text] { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--fg); min-width: 0; flex: 1 1 160px; }
-  button { font: inherit; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
-  button.secondary { background: transparent; color: var(--accent); }
-  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  pre { font-family: var(--font-mono); font-size: 12px; margin: 0; white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; }
-  dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; font-size: 13px; }
-  dt { color: var(--muted); }
-  dd { margin: 0; font-family: var(--font-mono); word-break: break-all; }
-  .big { font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums; }
-</style>
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #141a20; --panel: #1d252d; --fg: #e6ecf1; --muted: #9fb0bf; --line: #324050;
+        --accent: #5aa9f5; --ok: #4fc47f; --warn: #f0a33a; color-scheme: dark;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #141a20; --panel: #1d252d; --fg: #e6ecf1; --muted: #9fb0bf; --line: #324050;
+      --accent: #5aa9f5; --ok: #4fc47f; --warn: #f0a33a; color-scheme: dark;
+    }
+    html, body { height: 100%; margin: 0; }
+    body { background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 14px;
+      padding: 12px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)); box-sizing: border-box; }
+    .wrap { display: flex; flex-direction: column; gap: 12px; max-width: 720px; }
+    h1 { font-size: 18px; margin: 0; }
+    .sub { color: var(--muted); margin: 0; }
+    .status { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill { border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 12px; background: var(--panel); }
+    .pill b { font-weight: 600; }
+    .pill.ok { border-color: var(--ok); color: var(--ok); }
+    .pill.warn { border-color: var(--warn); color: var(--warn); }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px; min-width: 0; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .between { justify-content: space-between; }
+    label, .lbl { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    input.txt { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); color: var(--fg); min-width: 0; flex: 1 1 160px; }
+    button { font: inherit; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+    button.secondary { background: transparent; color: var(--accent); }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    pre { font-family: var(--font-mono); font-size: 12px; margin: 0; white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; }
+    dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0; font-size: 13px; }
+    dt { color: var(--muted); }
+    dd { margin: 0; font-family: var(--font-mono); word-break: break-all; }
+    .big { font-size: 32px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  </style>
+  <script type="text/javascript">
+  //<![CDATA[
+  (function () {
+    var lines = [];
+    var tries = 0;
+    var n = 0;
+    var started = false;
+
+    function $(id) { return document.getElementById(id); }
+    function log(msg) {
+      var t = new Date().toISOString().slice(11, 19);
+      lines.push(t + '  ' + msg);
+      if (lines.length > 40) { lines.shift(); }
+      if ($('log')) { $('log').textContent = lines.join('\n'); }
+    }
+    function pill(id, text, cls) {
+      var el = $(id);
+      if (!el) { return; }
+      el.innerHTML = '<b>' + el.getAttribute('data-label') + '</b> ' + text;
+      el.className = 'pill ' + (cls || '');
+    }
+    function fact(k, v) {
+      var dl = $('facts');
+      if (!dl) { return; }
+      var dt = document.createElement('dt'); dt.textContent = k;
+      var dd = document.createElement('dd'); dd.textContent = String(v);
+      dl.appendChild(dt); dl.appendChild(dd);
+    }
+    function greet(v) {
+      $('hello').textContent = v ? 'Hello ' + v + ', from a custom 3DDashboard app' : 'Hello from a custom 3DDashboard app';
+    }
+
+    function start() {
+      if (started) { return; }
+      started = true;
+      log('page script ran');
+      $('count').addEventListener('click', function () {
+        n += 1; $('n').textContent = n; log('counter -> ' + n);
+      });
+      pill('pill-host', location.host || '(no host)', '');
+      fact('page URL', location.href.split('?')[0]);
+      fact('in iframe', String(window.top !== window.self));
+      fact('user agent', navigator.userAgent.slice(0, 60) + '…');
+      var hasRequire = (typeof window.requirejs === 'function') || (typeof window.require === 'function');
+      pill('pill-require', hasRequire ? 'present' : 'absent', hasRequire ? 'ok' : 'warn');
+
+      // The dashboard injects the UWA widget object. Poll for it like the 3DS samples do.
+      var timer = setInterval(function () {
+        tries += 1;
+        if (typeof window.widget !== 'undefined' && window.widget) {
+          clearInterval(timer);
+          initWidget(window.widget);
+        } else if (tries > 50) {
+          clearInterval(timer);
+          pill('pill-widget', 'not found after 5 s (page opened outside 3DDashboard)', 'warn');
+          log('no widget object: running as a plain web page');
+          $('save').addEventListener('click', function () { greet($('greet').value.replace(/^\s+|\s+$/g, '')); });
+        }
+      }, 100);
+    }
+
+    function initWidget(widget) {
+      pill('pill-widget', 'found (' + (widget.id || 'no id') + ')', 'ok');
+      log('widget object found after ' + tries * 100 + ' ms');
+      try { widget.setTitle('Hello 3DX sample (live)'); log('widget.setTitle ok'); } catch (e) { log('setTitle failed: ' + e); }
+      try { fact('widget.id', widget.id); } catch (e) {}
+      try { fact('widget.uwaUrl', widget.uwaUrl || '(none)'); } catch (e) {}
+      try { fact('widget.getPreferences', JSON.stringify((widget.getPreferences && widget.getPreferences()) || null).slice(0, 120)); } catch (e) {}
+
+      var evs = ['onLoad', 'onRefresh', 'onResize', 'onEdit', 'onEndEdit', 'onViewChange'];
+      for (var i = 0; i < evs.length; i++) {
+        (function (ev) {
+          try { widget.addEvent(ev, function () { log('event ' + ev); }); } catch (e) { log('addEvent ' + ev + ' failed: ' + e); }
+        })(evs[i]);
+      }
+
+      var input = $('greet');
+      try {
+        var saved = widget.getValue && widget.getValue('greet');
+        if (saved) { input.value = saved; greet(saved); log('preference greet = ' + saved); }
+      } catch (e) { log('getValue failed: ' + e); }
+
+      $('save').addEventListener('click', function () {
+        var v = input.value.replace(/^\s+|\s+$/g, '');
+        try { widget.setValue('greet', v); log('widget.setValue greet=' + v); } catch (e) { log('setValue failed: ' + e); }
+        greet(v);
+      });
+      $('refresh').addEventListener('click', function () {
+        try { widget.refresh(); log('widget.refresh called'); } catch (e) { log('refresh failed: ' + e); }
+      });
+
+      // Optional: a 3DS module, only available when the page runs inside the platform.
+      var req = window.requirejs || window.require;
+      if (typeof req === 'function') {
+        try {
+          req(['DS/PlatformAPI/PlatformAPI'], function (PlatformAPI) {
+            var keys = []; for (var k in PlatformAPI) { if (keys.length < 6) { keys.push(k); } }
+            log('DS/PlatformAPI loaded: ' + keys.join(', '));
+          }, function (err) { log('DS/PlatformAPI not available: ' + (err && err.message)); });
+        } catch (e) { log('require call failed: ' + e); }
+      }
+    }
+
+    // Start once the DOM exists: the dashboard's onLoad if the widget object is already there, else DOMContentLoaded.
+    if (typeof window.widget !== 'undefined' && window.widget && window.widget.addEvent) {
+      try { window.widget.addEvent('onLoad', start); } catch (e) {}
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', start);
+    } else {
+      start();
+    }
+    window.addEventListener('load', start);
+  })();
+  //]]>
+  </script>
 </head>
 <body>
 <div class="wrap">
@@ -71,136 +180,37 @@
   </div>
 
   <div class="status">
-    <span class="pill" id="pill-widget"><b>widget object:</b> waiting…</span>
-    <span class="pill" id="pill-host"><b>runs at:</b> …</span>
-    <span class="pill" id="pill-require"><b>requirejs:</b> …</span>
+    <span class="pill" id="pill-widget" data-label="widget object:"><b>widget object:</b> waiting…</span>
+    <span class="pill" id="pill-host" data-label="runs at:"><b>runs at:</b> …</span>
+    <span class="pill" id="pill-require" data-label="require:"><b>require:</b> …</span>
   </div>
 
   <div class="panel">
+    <div class="row"><label for="greet">Your name (saved as a widget preference)</label></div>
     <div class="row">
-      <label for="greet">Your name (saved as a widget preference)</label>
-    </div>
-    <div class="row">
-      <input type="text" id="greet" placeholder="type a name">
-      <button id="save" type="button">Save &amp; greet</button>
+      <input type="text" class="txt" id="greet" placeholder="type a name" />
+      <button id="save" type="button">Save and greet</button>
       <button id="refresh" class="secondary" type="button">Ask dashboard to refresh</button>
     </div>
   </div>
 
   <div class="panel">
-    <div class="row" style="justify-content: space-between">
-      <label>Click counter (plain page state)</label>
+    <div class="row between">
+      <span class="lbl">Click counter (plain page state)</span>
       <button id="count" type="button">Count +1</button>
     </div>
     <div class="big" id="n">0</div>
   </div>
 
   <div class="panel">
-    <label>Dashboard facts</label>
+    <span class="lbl">Dashboard facts</span>
     <dl id="facts"></dl>
   </div>
 
   <div class="panel">
-    <label>Event log</label>
+    <span class="lbl">Event log</span>
     <pre id="log">booting…</pre>
   </div>
 </div>
-
-<script>
-(function () {
-  var logEl = document.getElementById('log');
-  var lines = [];
-  function log(msg) {
-    var t = new Date().toISOString().slice(11, 19);
-    lines.push(t + '  ' + msg);
-    if (lines.length > 40) lines.shift();
-    logEl.textContent = lines.join('\n');
-  }
-  function pill(id, text, cls) {
-    var el = document.getElementById(id);
-    el.innerHTML = '<b>' + el.querySelector('b').textContent + '</b> ' + text;
-    el.className = 'pill ' + (cls || '');
-  }
-  function fact(k, v) {
-    var dl = document.getElementById('facts');
-    var dt = document.createElement('dt'); dt.textContent = k;
-    var dd = document.createElement('dd'); dd.textContent = v;
-    dl.appendChild(dt); dl.appendChild(dd);
-  }
-
-  // Plain page state
-  var n = 0;
-  document.getElementById('count').addEventListener('click', function () {
-    n += 1; document.getElementById('n').textContent = n; log('counter -> ' + n);
-  });
-
-  pill('pill-host', location.host || '(no host)', '');
-  fact('page URL', location.href.split('?')[0]);
-  fact('in iframe', String(window.top !== window.self));
-  fact('user agent', navigator.userAgent.slice(0, 60) + '…');
-  pill('pill-require', typeof window.requirejs === 'function' ? 'present' : 'absent', typeof window.requirejs === 'function' ? 'ok' : 'warn');
-
-  // UWA / 3DDashboard widget object: injected by the dashboard. Poll for it like the 3DS samples do.
-  var tries = 0;
-  var timer = setInterval(function () {
-    tries += 1;
-    if (typeof window.widget !== 'undefined' && window.widget) {
-      clearInterval(timer);
-      initWidget(window.widget);
-    } else if (tries > 50) {
-      clearInterval(timer);
-      pill('pill-widget', 'not found after 5 s (page opened outside 3DDashboard)', 'warn');
-      log('no widget object: running as a plain web page');
-    }
-  }, 100);
-
-  function initWidget(widget) {
-    pill('pill-widget', 'found (' + (widget.id || 'no id') + ')', 'ok');
-    log('widget object found after ' + tries * 100 + ' ms');
-    try { widget.setTitle('Hello 3DX sample'); log('widget.setTitle ok'); } catch (e) { log('setTitle failed: ' + e); }
-    try { fact('widget.id', widget.id); } catch (e) {}
-    try { fact('widget.uwaUrl', widget.uwaUrl || '(none)'); } catch (e) {}
-    try { fact('widget.getPreferences', JSON.stringify((widget.getPreferences && widget.getPreferences()) || null).slice(0, 120)); } catch (e) {}
-
-    ['onLoad', 'onRefresh', 'onResize', 'onEdit', 'onEndEdit', 'onViewChange'].forEach(function (ev) {
-      try { widget.addEvent(ev, function () { log('event ' + ev); }); } catch (e) { log('addEvent ' + ev + ' failed: ' + e); }
-    });
-
-    var input = document.getElementById('greet');
-    try {
-      var saved = widget.getValue && widget.getValue('greet');
-      if (saved) { input.value = saved; greet(saved); log('preference greet = ' + saved); }
-    } catch (e) { log('getValue failed: ' + e); }
-
-    document.getElementById('save').addEventListener('click', function () {
-      var v = input.value.trim();
-      try { widget.setValue('greet', v); log('widget.setValue greet=' + v); } catch (e) { log('setValue failed: ' + e); }
-      greet(v);
-    });
-    document.getElementById('refresh').addEventListener('click', function () {
-      try { widget.refresh(); log('widget.refresh called'); } catch (e) { log('refresh failed: ' + e); }
-    });
-
-    // Optional: a 3DS module, only available when the page runs inside the platform.
-    if (typeof window.requirejs === 'function') {
-      try {
-        requirejs(['DS/PlatformAPI/PlatformAPI'], function (PlatformAPI) {
-          log('DS/PlatformAPI loaded: ' + Object.keys(PlatformAPI).slice(0, 6).join(', '));
-        }, function (err) { log('DS/PlatformAPI not available: ' + (err && err.message)); });
-      } catch (e) { log('requirejs call failed: ' + e); }
-    }
-  }
-
-  function greet(v) {
-    document.getElementById('hello').textContent = v ? 'Hello ' + v + ', from a custom 3DDashboard app' : 'Hello from a custom 3DDashboard app';
-  }
-
-  // Also wire the buttons when no widget object exists, so the page works standalone.
-  document.getElementById('save').addEventListener('click', function () {
-    if (typeof window.widget === 'undefined') greet(document.getElementById('greet').value.trim());
-  });
-  log('page script ran');
-})();
-</script>
 </body>
 </html>

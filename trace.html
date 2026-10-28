@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:widget="http://www.netvibes.com/ns/">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drop to Trace</title>
+  <meta name="apiVersion" content="1.0" />
+  <meta name="author" content="Saulius Pavalkis" />
+  <meta name="description" content="Drop a requirement, test or work item from another widget and see its traceability chain and coverage (Smart Irrigation Controller sample)." />
+  <meta name="debugMode" content="true" />
+  <link rel="icon" type="image/png" href="https://saupav.github.io/hello-3dx-widget/trace-icon.png" />
+  <link rel="richIcon" type="image/png" href="https://saupav.github.io/hello-3dx-widget/trace-richicon.png" />
+  <widget:preferences>
+    <widget:preference name="dataUrl" type="text" label="Trace data URL (JSON)" defaultValue="https://saupav.github.io/hello-3dx-widget/trace.json" />
+    <widget:preference name="jiraBase" type="text" label="Work item base URL (optional, e.g. https://your-site.atlassian.net/browse/)" defaultValue="" />
+    <widget:preference name="showLog" type="boolean" label="Show the event log" defaultValue="false" />
+  </widget:preferences>
+  <style type="text/css">
+    /* Tokens live on body and .wrap, not :root: the UWA engine rewrites selectors into its container. */
+    body, .wrap {
+      --bg: #f4f6f8; --panel: #ffffff; --fg: #1c2730; --muted: #5f6f7d; --line: #d5dde5;
+      --accent: #0a6ed1; --ok: #1f8f4e; --warn: #c77700; --bad: #c0392b;
+      --font-ui: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+      --font-mono: Consolas, "Cascadia Mono", Menlo, monospace;
+    }
+    html, body { height: 100%; margin: 0; }
+    body { background: var(--bg, #f4f6f8); color: var(--fg, #1c2730); font-family: var(--font-ui); font-size: 13px;
+      padding: 10px max(14px, env(safe-area-inset-right, 0px)) 10px max(14px, env(safe-area-inset-left, 0px)); box-sizing: border-box; }
+    .wrap { display: flex; flex-direction: column; gap: 10px; max-width: 900px; }
+    h1 { font-size: 16px; margin: 0; }
+    h2 { font-size: 12px; margin: 0 0 6px 0; color: var(--muted, #5f6f7d); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+    .sub { color: var(--muted, #5f6f7d); margin: 0; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .between { justify-content: space-between; }
+    .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+    .tile { background: #ffffff; border: 1px solid #d5dde5; border-radius: 6px; padding: 8px 10px; }
+    .tile .k { color: var(--muted, #5f6f7d); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+    .tile .v { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .tile .v small { font-size: 12px; font-weight: 400; color: var(--muted, #5f6f7d); }
+    .drop { border: 2px dashed #0a6ed1; border-radius: 8px; padding: 18px 14px; text-align: center; background: #ffffff; color: #0a6ed1; font-weight: 600; transition: background .15s; }
+    .drop.over { background: #e3f0fc; border-style: solid; }
+    .drop .hint { display: block; font-weight: 400; color: var(--muted, #5f6f7d); margin-top: 4px; font-size: 12px; }
+    input.txt { font: inherit; padding: 6px 8px; border: 1px solid #c3ced8; border-radius: 4px; background: #ffffff; color: var(--fg, #1c2730); min-width: 0; flex: 1 1 200px; }
+    button { font: inherit; padding: 5px 11px; border-radius: 4px; border: 1px solid #0a6ed1; background: #0a6ed1; color: #ffffff; cursor: pointer; }
+    button.secondary { background: transparent; color: #0a6ed1; }
+    button.chip { background: #ffffff; color: #1c2730; border: 1px solid #c3ced8; border-radius: 999px; padding: 3px 10px; font-size: 12px; }
+    button.chip:hover { border-color: #0a6ed1; color: #0a6ed1; }
+    button:focus-visible, input:focus-visible { outline: 2px solid #0a6ed1; outline-offset: 2px; }
+    .panel { background: #ffffff; border: 1px solid #d5dde5; border-radius: 6px; padding: 10px 12px; min-width: 0; }
+    .badge { display: inline-block; border-radius: 999px; padding: 2px 9px; font-size: 11px; font-weight: 600; border: 1px solid; }
+    .badge.ok { color: #1f8f4e; border-color: #1f8f4e; background: #eaf6ee; }
+    .badge.bad { color: #c0392b; border-color: #c0392b; background: #fbeeec; }
+    .badge.kind { color: #5f6f7d; border-color: #c3ced8; background: #f4f6f8; font-weight: 500; }
+    .id { font-family: var(--font-mono); font-size: 12px; color: #0a6ed1; }
+    .card h3 { margin: 4px 0 2px 0; font-size: 15px; }
+    .card p { margin: 4px 0 0 0; }
+    .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+    .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+    .list li { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+    .list a, .list .lnk { color: #0a6ed1; text-decoration: none; cursor: pointer; border-bottom: 1px dotted #0a6ed1; }
+    .list .rel { color: var(--muted, #5f6f7d); font-size: 11px; }
+    .list .st { font-size: 11px; color: #5f6f7d; border: 1px solid #c3ced8; border-radius: 3px; padding: 0 4px; }
+    .empty { color: var(--muted, #5f6f7d); font-style: italic; }
+    .gap { color: #c0392b; }
+    .crumbs { font-size: 12px; color: var(--muted, #5f6f7d); }
+    .crumbs .lnk { color: #0a6ed1; cursor: pointer; }
+    pre { font-family: var(--font-mono); font-size: 11px; margin: 0; white-space: pre-wrap; word-break: break-word; max-height: 160px; overflow: auto; }
+    .hidden { display: none; }
+  </style>
+  <script type="text/javascript">
+  //<![CDATA[
+  (function () {
+    var DEFAULT_DATA = 'https://saupav.github.io/hello-3dx-widget/trace.json';
+    var lines = [], widget = null, data = null, byId = {}, byName = {}, history = [], jiraBase = '';
+
+    function $(id) { return document.getElementById(id); }
+    function log(msg) {
+      var t = new Date().toISOString().slice(11, 19);
+      lines.push(t + '  ' + msg); if (lines.length > 60) { lines.shift(); }
+      if ($('log')) { $('log').textContent = lines.join('\n'); }
+    }
+    function el(tag, cls, text) { var e = document.createElement(tag); if (cls) { e.className = cls; } if (text !== undefined) { e.textContent = text; } return e; }
+    function clear(node) { while (node.firstChild) { node.removeChild(node.firstChild); } }
+    function esc(s) { return String(s == null ? '' : s); }
+
+    // ---------------------------------------------------------------- data
+    function loadData(url) {
+      log('loading trace data ' + url);
+      var bust = url + (url.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now();
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', bust, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState !== 4) { return; }
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try { data = JSON.parse(xhr.responseText); index(); renderSummary(); log('trace data: ' + data.items.length + ' items'); }
+          catch (e) { log('bad trace data: ' + e); }
+        } else { log('trace data failed: HTTP ' + xhr.status); $('sample').textContent = 'Could not load the trace data (HTTP ' + xhr.status + ').'; }
+      };
+      xhr.send();
+    }
+    function index() {
+      byId = {}; byName = {};
+      for (var i = 0; i < data.items.length; i++) {
+        var it = data.items[i];
+        byId[it.id.toUpperCase()] = it; byName[it.name.toUpperCase()] = it;
+        if (it.key) { byId[String(it.key).toUpperCase()] = it; }
+        if (it.id.indexOf(':') > 0) { byId[it.id.split(':')[1].toUpperCase()] = it; }
+      }
+      var dl = $('names'); clear(dl);
+      for (var j = 0; j < data.items.length; j++) { var o = el('option'); o.value = shortId(data.items[j]) + ' ' + data.items[j].name; dl.appendChild(o); }
+    }
+    function shortId(it) { return it.id.indexOf(':') > 0 ? it.id.split(':')[1] : it.id; }
+    function renderSummary() {
+      $('sample').textContent = data.sample + ' (' + data.items.length + ' linked elements from ' + data.sources.join(', ') + ')';
+      var s = data.summary, t = $('tiles'); clear(t);
+      tile(t, 'System requirements covered', s['System requirement'].covered, s['System requirement'].total);
+      tile(t, 'Software requirements covered', s['Software requirement'].covered, s['Software requirement'].total);
+      var counts = {};
+      for (var i = 0; i < data.items.length; i++) { var k = data.items[i].kind.replace(/ \(.*\)$/, ''); counts[k] = (counts[k] || 0) + 1; }
+      tile(t, 'Architecture blocks', counts['Architecture block'] || 0);
+      tile(t, 'Test cases', counts['Test case'] || 0);
+      tile(t, 'Work items', counts['Work item'] || 0);
+      tile(t, 'Dangling links', (data.dangling || []).length);
+    }
+    function tile(parent, k, v, total) {
+      var d = el('div', 'tile'); d.appendChild(el('div', 'k', k));
+      var val = el('div', 'v', String(v));
+      if (total !== undefined) { var sm = el('small', '', ' / ' + total); val.appendChild(sm); }
+      d.appendChild(val); parent.appendChild(d);
+    }
+
+    // ---------------------------------------------------------------- matching
+    function collectStrings(o, out, depth) {
+      if (depth > 6 || !o) { return; }
+      if (typeof o === 'string') { out.push(o); return; }
+      if (typeof o !== 'object') { return; }
+      if (Object.prototype.toString.call(o) === '[object Array]') { for (var i = 0; i < o.length; i++) { collectStrings(o[i], out, depth + 1); } return; }
+      var keys = ['displayName', 'title', 'name', 'label', 'objectId', 'physicalid', 'id'];
+      for (var k = 0; k < keys.length; k++) { if (typeof o[keys[k]] === 'string') { out.push(o[keys[k]]); } }
+      for (var p in o) { if (o.hasOwnProperty(p) && o[p] && typeof o[p] === 'object') { collectStrings(o[p], out, depth + 1); } }
+    }
+    function resolve(text) {
+      if (!data) { return null; }
+      var s = String(text || ''), m;
+      m = s.match(/SIC-(SYS|SW)-\d{3}/i); if (m && byId[m[0].toUpperCase()]) { return byId[m[0].toUpperCase()]; }
+      m = s.match(/\bTC-\d{2}\b/i); if (m && byId[m[0].toUpperCase()]) { return byId[m[0].toUpperCase()]; }
+      m = s.match(/\bSIC-\d{1,4}\b/i); if (m && byId[m[0].toUpperCase()]) { return byId[m[0].toUpperCase()]; }
+      m = s.match(/\b(E|S|B|T)\d{1,2}\b/); if (m && byId[m[0].toUpperCase()] && /work item/i.test(byId[m[0].toUpperCase()].kind)) { return byId[m[0].toUpperCase()]; }
+      var u = s.toUpperCase().replace(/^\s+|\s+$/g, '');
+      if (byId[u]) { return byId[u]; }
+      if (byName[u]) { return byName[u]; }
+      for (var i = 0; i < data.items.length; i++) {
+        var it = data.items[i];
+        if (u.length >= 4 && (u.indexOf(it.name.toUpperCase()) >= 0 || it.name.toUpperCase().indexOf(u) >= 0)) { return it; }
+      }
+      return null;
+    }
+    function handlePayload(raw, via) {
+      log('drop via ' + via + ': ' + esc(raw).slice(0, 400));
+      var cands = [];
+      try { collectStrings(JSON.parse(raw), cands, 0); } catch (e) { cands.push(String(raw)); }
+      for (var i = 0; i < cands.length; i++) {
+        var hit = resolve(cands[i]);
+        if (hit) { log('matched "' + cands[i] + '" -> ' + hit.id); show(hit, true); return; }
+      }
+      noMatch(cands);
+    }
+    function noMatch(cands) {
+      var r = $('result'); clear(r);
+      r.appendChild(el('p', 'empty', 'No trace record matches the dropped object'));
+      if (cands.length) {
+        var ul = el('ul', 'list');
+        for (var i = 0; i < Math.min(cands.length, 8); i++) { ul.appendChild(el('li', '', cands[i])); }
+        r.appendChild(el('h2', '', 'Names tried')); r.appendChild(ul);
+      }
+      r.appendChild(el('p', 'sub', 'Drop a Smart Irrigation Controller requirement, test or work item, or search by id or name.'));
+    }
+
+    // ---------------------------------------------------------------- rendering
+    function show(it, push) {
+      if (push !== false) { if (!history.length || history[history.length - 1] !== it.id) { history.push(it.id); } if (history.length > 12) { history.shift(); } }
+      var r = $('result'); clear(r);
+      if (history.length > 1) {
+        var c = el('div', 'crumbs'), from = Math.max(0, history.length - 5);
+        for (var h = from; h < history.length; h++) {
+          if (h > from) { c.appendChild(document.createTextNode(' › ')); }
+          var hit = byId[history[h].toUpperCase()];
+          if (!hit) { continue; }
+          if (hit === it) { c.appendChild(el('span', '', shortId(hit))); } else { c.appendChild(linkTo(hit, shortId(hit))); }
+        }
+        r.appendChild(c);
+      }
+      var card = el('div', 'card');
+      var top = el('div', 'row');
+      top.appendChild(el('span', 'id', shortId(it)));
+      top.appendChild(el('span', 'badge kind', it.kind));
+      if (it.status) { top.appendChild(el('span', 'badge kind', it.status)); }
+      if (it.coverage) {
+        var b = el('span', 'badge ' + (it.coverage.covered ? 'ok' : 'bad'), it.coverage.covered ? 'Covered' : 'Not covered: missing ' + it.coverage.missing.join(', '));
+        b.title = 'Rule: ' + it.coverage.rule; top.appendChild(b);
+      }
+      card.appendChild(top);
+      card.appendChild(el('h3', '', it.name));
+      if (it.text) { card.appendChild(el('p', '', it.text)); }
+      if (it.component) { card.appendChild(el('p', 'sub', 'Component: ' + it.component)); }
+      if (/work item/i.test(it.kind) && jiraBase && it.key) {
+        var a = el('a', '', 'Open ' + it.key); a.href = jiraBase + it.key; a.target = '_blank'; a.rel = 'noopener';
+        var pa = el('p', ''); pa.appendChild(a); card.appendChild(pa);
+      }
+      r.appendChild(card);
+      var cols = el('div', 'cols');
+      cols.appendChild(column('Upstream (what this traces to)', it.up, 'up'));
+      var groups = groupDown(it.down);
+      var order = [['derives from', 'Derived software requirements'], ['satisfies', 'Architecture blocks that satisfy it'], ['verifies', 'Test cases that verify it'], ['covers', 'Work items that cover it']];
+      var any = false;
+      for (var g = 0; g < order.length; g++) { if (groups[order[g][0]]) { cols.appendChild(column(order[g][1], groups[order[g][0]], 'down')); any = true; } }
+      if (!any) { cols.appendChild(column('Downstream', [], 'down')); }
+      r.appendChild(cols);
+      if (it.coverage && !it.coverage.covered) {
+        r.appendChild(el('p', 'gap', 'Gap: ' + shortId(it) + ' has no ' + it.coverage.missing.join(' and no ') + ' (rule: ' + it.coverage.rule + ').'));
+      }
+      try { if (widget) { widget.setTitle('Drop to Trace: ' + shortId(it)); } } catch (e) {}
+    }
+    function groupDown(down) {
+      var g = {}; for (var i = 0; i < down.length; i++) { (g[down[i].rel] = g[down[i].rel] || []).push(down[i]); } return g;
+    }
+    function column(title, links, dir) {
+      var p = el('div', 'panel'); p.appendChild(el('h2', '', title));
+      if (!links || !links.length) { p.appendChild(el('p', 'empty', 'none')); return p; }
+      var ul = el('ul', 'list');
+      for (var i = 0; i < links.length; i++) {
+        var t = byId[links[i].id.toUpperCase()]; if (!t) { continue; }
+        var li = el('li');
+        li.appendChild(linkTo(t, shortId(t) + ' ' + t.name));
+        li.appendChild(el('span', 'rel', dir === 'up' ? links[i].rel : t.kind));
+        if (t.status) { li.appendChild(el('span', 'st', t.status)); }
+        if (t.coverage) { li.appendChild(el('span', 'badge ' + (t.coverage.covered ? 'ok' : 'bad'), t.coverage.covered ? 'covered' : 'gap')); }
+        ul.appendChild(li);
+      }
+      p.appendChild(ul); return p;
+    }
+    function linkTo(it, text) {
+      var a = el('span', 'lnk', text); a.setAttribute('role', 'link'); a.tabIndex = 0;
+      a.onclick = function () { show(it); };
+      a.onkeydown = function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(it); } };
+      return a;
+    }
+
+    // ---------------------------------------------------------------- drop wiring
+    function wireNativeDrop(zone) {
+      zone.addEventListener('dragenter', function (e) { e.preventDefault(); zone.className = 'drop over'; });
+      zone.addEventListener('dragover', function (e) { e.preventDefault(); if (e.dataTransfer) { e.dataTransfer.dropEffect = 'copy'; } zone.className = 'drop over'; });
+      zone.addEventListener('dragleave', function () { zone.className = 'drop'; });
+      zone.addEventListener('drop', function (e) {
+        e.preventDefault(); zone.className = 'drop';
+        var dt = e.dataTransfer, types = [], raw = '';
+        if (dt) {
+          try { for (var i = 0; i < dt.types.length; i++) { types.push(dt.types[i]); } } catch (x) {}
+          var pref = ['text', 'text/plain', 'application/json', 'text/uri-list'];
+          for (var p = 0; p < pref.length && !raw; p++) { try { raw = dt.getData(pref[p]); } catch (x2) {} }
+          for (var q = 0; q < types.length && !raw; q++) { try { raw = dt.getData(types[q]); } catch (x3) {} }
+        }
+        log('native drop types: ' + types.join(', '));
+        if (raw) { handlePayload(raw, 'HTML5 dataTransfer'); } else { log('native drop had no readable data'); }
+      });
+    }
+    function wireDsDrop(zone) {
+      var req = window.requirejs || window.require;
+      if (typeof req !== 'function') { log('no require: DS drag and drop module not available'); return; }
+      try {
+        req(['DS/DataDragAndDrop/DataDragAndDrop'], function (DnD) {
+          try {
+            DnD.droppable(zone, {
+              drop: function (payload) { zone.className = 'drop'; handlePayload(typeof payload === 'string' ? payload : JSON.stringify(payload), 'DS/DataDragAndDrop'); },
+              enter: function () { zone.className = 'drop over'; },
+              leave: function () { zone.className = 'drop'; }
+            });
+            log('DS/DataDragAndDrop droppable registered'); $('dropstate').textContent = 'Drop zone ready for 3DEXPERIENCE objects';
+          } catch (e) { log('droppable failed: ' + e); }
+        }, function (err) { log('DS/DataDragAndDrop not available: ' + (err && err.message)); });
+      } catch (e) { log('require failed: ' + e); }
+    }
+
+    // ---------------------------------------------------------------- boot
+    var started = false;
+    function start() {
+      if (started) { return; } started = true;
+      log('page script ran at ' + location.host);
+      var zone = $('drop'); wireNativeDrop(zone);
+      $('go').addEventListener('click', doSearch);
+      $('q').addEventListener('keydown', function (e) { if (e.key === 'Enter') { doSearch(); } });
+      var chips = document.querySelectorAll('button.chip');
+      for (var i = 0; i < chips.length; i++) { chips[i].addEventListener('click', function (ev) { var hit = resolve(ev.currentTarget.getAttribute('data-id')); if (hit) { show(hit); } }); }
+      $('toggle-log').addEventListener('click', function () { var lg = $('logpanel'); lg.className = lg.className ? '' : 'hidden'; });
+      var tries = 0;
+      var timer = setInterval(function () {
+        tries += 1;
+        if (window.widget) { clearInterval(timer); initWidget(window.widget); }
+        else if (tries > 50) { clearInterval(timer); log('no widget object: plain page mode'); loadData(DEFAULT_DATA); wireDsDrop(zone); }
+      }, 100);
+    }
+    function doSearch() {
+      var v = $('q').value.replace(/^\s+|\s+$/g, ''); if (!v) { return; }
+      var hit = resolve(v); if (hit) { show(hit); } else { noMatch([v]); }
+    }
+    function readPrefs() {
+      var url = DEFAULT_DATA;
+      try { var u = widget.getValue('dataUrl'); if (u) { url = u; } } catch (e) {}
+      try { jiraBase = widget.getValue('jiraBase') || ''; } catch (e2) {}
+      try { var sl = widget.getValue('showLog'); $('logpanel').className = (sl === true || sl === 'true') ? '' : 'hidden'; } catch (e3) {}
+      return url;
+    }
+    function initWidget(w) {
+      widget = w; log('widget object found: ' + (w.id || '?'));
+      try { w.setTitle('Drop to Trace'); } catch (e) {}
+      try { w.addEvent('onEndEdit', function () { log('preferences changed'); loadData(readPrefs()); }); } catch (e2) {}
+      try { w.addEvent('onRefresh', function () { log('refresh'); loadData(readPrefs()); }); } catch (e3) {}
+      loadData(readPrefs());
+      wireDsDrop($('drop'));
+      var req = window.requirejs || window.require;
+      if (typeof req === 'function') {
+        try { req(['DS/PlatformAPI/PlatformAPI'], function (P) { try { log('user ' + P.getUser() + ', tenant ' + P.getTenant()); } catch (e) {} }, function () {}); } catch (e4) {}
+      }
+    }
+    if (window.widget && window.widget.addEvent) { try { window.widget.addEvent('onLoad', start); } catch (e) {} }
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', start); } else { start(); }
+    window.addEventListener('load', start);
+  })();
+  //]]>
+  </script>
+</head>
+<body>
+<div class="wrap">
+  <div class="row between">
+    <div>
+      <h1>Drop to Trace</h1>
+      <p class="sub" id="sample">Loading trace data&#8230;</p>
+    </div>
+    <button id="toggle-log" class="secondary" type="button">Log</button>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="drop" id="drop">
+    Drop a requirement, test case or work item here
+    <span class="hint" id="dropstate">Drag it from another widget on this tab, for example the Requirements or Bookmark widget</span>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <input type="text" class="txt" id="q" list="names" placeholder="or search: SIC-SW-007, Flow Guard, TC-04, Leak protection" />
+      <datalist id="names"></datalist>
+      <button id="go" type="button">Trace</button>
+    </div>
+    <div class="row" style="margin-top: 8px">
+      <span class="sub">Try:</span>
+      <button class="chip" type="button" data-id="SIC-SYS-004">SIC-SYS-004 Leak protection</button>
+      <button class="chip" type="button" data-id="SIC-SW-007">SIC-SW-007 (no test)</button>
+      <button class="chip" type="button" data-id="SIC-SW-011">SIC-SW-011 (no work item)</button>
+      <button class="chip" type="button" data-id="BLK:Flow Guard">Flow Guard</button>
+      <button class="chip" type="button" data-id="TC-04">TC-04</button>
+    </div>
+  </div>
+
+  <div class="panel" id="result">
+    <p class="empty">Nothing traced yet. Drop an object above or pick an example.</p>
+  </div>
+
+  <div class="panel hidden" id="logpanel">
+    <h2>Event log</h2>
+    <pre id="log">booting&#8230;</pre>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1165 @@
+{
+ "sample": "Smart Irrigation Controller (SIC) traceability sample",
+ "generated": "2026-10-28",
+ "sources": [
+  "requirements.csv",
+  "architecture.csv",
+  "tests.csv",
+  "jira_issues.json"
+ ],
+ "summary": {
+  "System requirement": {
+   "total": 8,
+   "covered": 8
+  },
+  "Software requirement": {
+   "total": 12,
+   "covered": 9
+  }
+ },
+ "dangling": [
+  {
+   "from": "JIRA:S8",
+   "to": "SIC-SW-099",
+   "rel": "covers"
+  }
+ ],
+ "items": [
+  {
+   "id": "SIC-SYS-001",
+   "kind": "System requirement",
+   "name": "Scheduled watering",
+   "text": "The controller shall water each irrigation zone according to a user-defined weekly schedule (start time and duration per zone).",
+   "up": [],
+   "down": [
+    {
+     "id": "SIC-SW-001",
+     "rel": "derives from"
+    },
+    {
+     "id": "SIC-SW-002",
+     "rel": "derives from"
+    }
+   ],
+   "level": "System",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "software requirement OR work item"
+   }
+  },
+  {
+   "id": "SIC-SYS-002",
+   "kind": "System requirement",
+   "name": "Moisture-based skipping",
+   "text": "The controller shall skip a scheduled watering of a zone when the measured soil moisture of that zone is above the configured threshold.",
+   "up": [],
+   "down": [
+    {
+     "id": "SIC-SW-003",
+     "rel": "derives from"
+    },
+    {
+     "id": "SIC-SW-004",
+     "rel": "derives from"
+    }
+   ],
+   "level": "System",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "software requirement OR work item"
+   }
+  },
+  {
+   "id": "SIC-SYS-003",
+   "kind": "System requirement",
+   "name": "Rain-aware watering",
+   "text": "The controller shall reduce the watering duration when rain is forecast within the next 24 hours.",
+   "up": [],
+   "down": [
+    {
+     "id": "SIC-SW-005",
+     "rel": "derives from"
+    },
+    {
+     "id": "SIC-SW-006",
+     "rel": "derives from"
+    },
+    {
+     "id": "JIRA:E1",
+     "rel": "covers"
+    }
+   ],
+   "level": "System",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "software requirement OR work item"
+   }
+  },
+  {
+   "id": "SIC-SYS-004",
+   "kind": "System requirement",
+   "name": "Leak protection",
+   "text": "The controller shall close all valves and alert the user when the measured water flow exceeds the expected flow by more than 30 % for 60 seconds.",
+   "up": [],
+   "down": [
+    {
+     "id": "SIC-SW-007",
+     "rel": "derives from"
+    },
+    {
+     "id": "SIC-SW-008",
+     "rel": "derives from"
+    },
+    {
+     "id": "SIC-SW-012",
+     "rel": "derives from"
+    },
+    {
+     "id": "JIRA:E2",
+     "rel": "covers"
+    },
+    {
+     "id": "JIRA:T3",
+     "rel": "covers"
+    }
+   ],
+   "level": "System",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "software requirement OR work item"
+   }
+  },
+  {
+   "id": "SIC-SYS-005",
+   "kind": "System requirement",
+   "name": "Mobile control",
+   "text": "The user shall be able to start and stop any zone from the mobile application.",
+   "up": [],
+   "down": [
+    {
+     "id": "SIC-SW-009",
+     "rel": "derives from"
+    }
+   ],
+   "level": "System",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "software requirement OR work item"
+   }
+  },
+  {
+   "id": "SIC-SYS-006",
+   "kind": "System requirement",
+   "name": "Schedule retention",
+   "text": "The controller shall retain all schedules and settings through a power loss of up to 72 hours.",
+   "up": [],
+   "down": [
+    {
+     "id": "SIC-SW-001",
+     "rel": "derives from"
+    }
+   ],
+   "level": "System",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "software requirement OR work item"
+   }
+  },
+  {
+   "id": "SIC-SYS-007",
+   "kind": "System requirement",
+   "name": "Zone capacity",
+   "text": "The controller shall support up to 8 irrigation zones.",
+   "up": [],
+   "down": [
+    {
+     "id": "SIC-SW-011",
+     "rel": "derives from"
+    }
+   ],
+   "level": "System",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "software requirement OR work item"
+   }
+  },
+  {
+   "id": "SIC-SYS-008",
+   "kind": "System requirement",
+   "name": "Manual override",
+   "text": "A physical button on the controller shall run the selected zone for 5 minutes regardless of the schedule.",
+   "up": [],
+   "down": [
+    {
+     "id": "SIC-SW-010",
+     "rel": "derives from"
+    }
+   ],
+   "level": "System",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "software requirement OR work item"
+   }
+  },
+  {
+   "id": "SIC-SW-001",
+   "kind": "Software requirement",
+   "name": "Schedule persistence",
+   "text": "The software shall store schedules and settings in non-volatile memory and reload them at start-up.",
+   "up": [
+    {
+     "id": "SIC-SYS-001",
+     "rel": "derives from"
+    },
+    {
+     "id": "SIC-SYS-006",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Config Store",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-01",
+     "rel": "verifies"
+    },
+    {
+     "id": "JIRA:S5",
+     "rel": "covers"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-002",
+   "kind": "Software requirement",
+   "name": "Schedule execution",
+   "text": "The software shall open the valve of a zone at the scheduled start time and close it after the scheduled duration, with a timing accuracy of 2 seconds.",
+   "up": [
+    {
+     "id": "SIC-SYS-001",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Scheduler",
+     "rel": "satisfies"
+    },
+    {
+     "id": "BLK:Zone Controller",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-02",
+     "rel": "verifies"
+    },
+    {
+     "id": "JIRA:B2",
+     "rel": "covers"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-003",
+   "kind": "Software requirement",
+   "name": "Moisture sampling",
+   "text": "The software shall read every soil moisture sensor at least once every 10 minutes.",
+   "up": [
+    {
+     "id": "SIC-SYS-002",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Moisture Monitor",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-03",
+     "rel": "verifies"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": false,
+    "missing": [
+     "work item"
+    ],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-004",
+   "kind": "Software requirement",
+   "name": "Moisture skip rule",
+   "text": "The software shall skip the next scheduled run of a zone when the latest moisture reading of that zone exceeds the zone threshold (default 60 %).",
+   "up": [
+    {
+     "id": "SIC-SYS-002",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Moisture Monitor",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-04",
+     "rel": "verifies"
+    },
+    {
+     "id": "JIRA:B1",
+     "rel": "covers"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-005",
+   "kind": "Software requirement",
+   "name": "Forecast retrieval",
+   "text": "The software shall retrieve the 24-hour precipitation forecast from the weather service every 6 hours and shall use the last successful forecast for at most 24 hours when the service is unavailable.",
+   "up": [
+    {
+     "id": "SIC-SYS-003",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Weather Client",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-05",
+     "rel": "verifies"
+    },
+    {
+     "id": "JIRA:S1",
+     "rel": "covers"
+    },
+    {
+     "id": "JIRA:B3",
+     "rel": "covers"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-006",
+   "kind": "Software requirement",
+   "name": "Rain reduction",
+   "text": "The software shall reduce the duration of scheduled runs by the configured rain factor (default 50 %) when the precipitation probability for the next 24 hours exceeds 70 %.",
+   "up": [
+    {
+     "id": "SIC-SYS-003",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Scheduler",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-06",
+     "rel": "verifies"
+    },
+    {
+     "id": "JIRA:S2",
+     "rel": "covers"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-007",
+   "kind": "Software requirement",
+   "name": "Flow monitoring",
+   "text": "The software shall compute the expected flow of each zone from its calibration and compare it with the measured flow every second.",
+   "up": [
+    {
+     "id": "SIC-SYS-004",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Flow Guard",
+     "rel": "satisfies"
+    },
+    {
+     "id": "JIRA:S3",
+     "rel": "covers"
+    },
+    {
+     "id": "JIRA:T3",
+     "rel": "covers"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": false,
+    "missing": [
+     "test"
+    ],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-008",
+   "kind": "Software requirement",
+   "name": "Leak shutdown",
+   "text": "The software shall close all valves within 2 seconds and raise a leak alert when the measured flow exceeds the expected flow by more than 30 % for 60 consecutive seconds.",
+   "up": [
+    {
+     "id": "SIC-SYS-004",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Zone Controller",
+     "rel": "satisfies"
+    },
+    {
+     "id": "BLK:Flow Guard",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-07",
+     "rel": "verifies"
+    },
+    {
+     "id": "JIRA:S4",
+     "rel": "covers"
+    },
+    {
+     "id": "JIRA:T1",
+     "rel": "covers"
+    },
+    {
+     "id": "JIRA:T3",
+     "rel": "covers"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-009",
+   "kind": "Software requirement",
+   "name": "App command handling",
+   "text": "The software shall execute start and stop commands received from the mobile application within 1 second.",
+   "up": [
+    {
+     "id": "SIC-SYS-005",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:App Gateway",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-08",
+     "rel": "verifies"
+    },
+    {
+     "id": "JIRA:B2",
+     "rel": "covers"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-010",
+   "kind": "Software requirement",
+   "name": "Manual button run",
+   "text": "The software shall run the selected zone for 5 minutes when the manual button is pressed and shall stop the run on a second press.",
+   "up": [
+    {
+     "id": "SIC-SYS-008",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Manual Control",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-09",
+     "rel": "verifies"
+    },
+    {
+     "id": "JIRA:S6",
+     "rel": "covers"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-011",
+   "kind": "Software requirement",
+   "name": "Zone limit",
+   "text": "The software shall accept configuration for zones 1 to 8 and shall reject any zone number above 8.",
+   "up": [
+    {
+     "id": "SIC-SYS-007",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Config Store",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-10",
+     "rel": "verifies"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": false,
+    "missing": [
+     "work item"
+    ],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "SIC-SW-012",
+   "kind": "Software requirement",
+   "name": "Alert notification",
+   "text": "The software shall send a push notification containing the zone number and the time of the event for every leak alert.",
+   "up": [
+    {
+     "id": "SIC-SYS-004",
+     "rel": "derives from"
+    }
+   ],
+   "down": [
+    {
+     "id": "BLK:Notification Service",
+     "rel": "satisfies"
+    },
+    {
+     "id": "TC-11",
+     "rel": "verifies"
+    },
+    {
+     "id": "JIRA:S4",
+     "rel": "covers"
+    },
+    {
+     "id": "JIRA:S7",
+     "rel": "covers"
+    }
+   ],
+   "level": "Software",
+   "coverage": {
+    "covered": true,
+    "missing": [],
+    "rule": "architecture AND test AND work item"
+   }
+  },
+  {
+   "id": "BLK:Scheduler",
+   "kind": "Architecture block",
+   "name": "Scheduler",
+   "text": "Runs the weekly schedule and applies the rain factor.",
+   "up": [
+    {
+     "id": "SIC-SW-002",
+     "rel": "satisfies"
+    },
+    {
+     "id": "SIC-SW-006",
+     "rel": "satisfies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "BLK:Config Store",
+   "kind": "Architecture block",
+   "name": "Config Store",
+   "text": "Non-volatile storage of schedules, thresholds and zone configuration.",
+   "up": [
+    {
+     "id": "SIC-SW-001",
+     "rel": "satisfies"
+    },
+    {
+     "id": "SIC-SW-011",
+     "rel": "satisfies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "BLK:Zone Controller",
+   "kind": "Architecture block",
+   "name": "Zone Controller",
+   "text": "Drives the valve outputs of the 8 zones.",
+   "up": [
+    {
+     "id": "SIC-SW-002",
+     "rel": "satisfies"
+    },
+    {
+     "id": "SIC-SW-008",
+     "rel": "satisfies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "BLK:Moisture Monitor",
+   "kind": "Architecture block",
+   "name": "Moisture Monitor",
+   "text": "Samples the soil moisture sensors and evaluates the skip rule.",
+   "up": [
+    {
+     "id": "SIC-SW-003",
+     "rel": "satisfies"
+    },
+    {
+     "id": "SIC-SW-004",
+     "rel": "satisfies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "BLK:Weather Client",
+   "kind": "Architecture block",
+   "name": "Weather Client",
+   "text": "Fetches the precipitation forecast from the weather service.",
+   "up": [
+    {
+     "id": "SIC-SW-005",
+     "rel": "satisfies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "BLK:Flow Guard",
+   "kind": "Architecture block",
+   "name": "Flow Guard",
+   "text": "Compares measured and expected flow and triggers the leak shutdown.",
+   "up": [
+    {
+     "id": "SIC-SW-007",
+     "rel": "satisfies"
+    },
+    {
+     "id": "SIC-SW-008",
+     "rel": "satisfies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "BLK:App Gateway",
+   "kind": "Architecture block",
+   "name": "App Gateway",
+   "text": "Receives commands from the mobile application.",
+   "up": [
+    {
+     "id": "SIC-SW-009",
+     "rel": "satisfies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "BLK:Manual Control",
+   "kind": "Architecture block",
+   "name": "Manual Control",
+   "text": "Handles the manual override button.",
+   "up": [
+    {
+     "id": "SIC-SW-010",
+     "rel": "satisfies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "BLK:Notification Service",
+   "kind": "Architecture block",
+   "name": "Notification Service",
+   "text": "Sends push notifications to the user.",
+   "up": [
+    {
+     "id": "SIC-SW-012",
+     "rel": "satisfies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-01",
+   "kind": "Test case",
+   "name": "Schedule reload after power cycle",
+   "text": "Configure two zones, power-cycle the controller, check that both schedules are present.",
+   "up": [
+    {
+     "id": "SIC-SW-001",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-02",
+   "kind": "Test case",
+   "name": "Start time accuracy",
+   "text": "Schedule zone 3 at 06:00 for 10 min, measure valve open and close times.",
+   "up": [
+    {
+     "id": "SIC-SW-002",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-03",
+   "kind": "Test case",
+   "name": "Moisture sampling period",
+   "text": "Log sensor reads for one hour, check at least six reads per sensor.",
+   "up": [
+    {
+     "id": "SIC-SW-003",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-04",
+   "kind": "Test case",
+   "name": "Skip on wet soil",
+   "text": "Set zone threshold 50 %, inject 65 % reading, confirm the next run is skipped.",
+   "up": [
+    {
+     "id": "SIC-SW-004",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-05",
+   "kind": "Test case",
+   "name": "Forecast fallback",
+   "text": "Block the weather service, confirm the last forecast is used for 24 h then discarded.",
+   "up": [
+    {
+     "id": "SIC-SW-005",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-06",
+   "kind": "Test case",
+   "name": "Rain reduction",
+   "text": "Inject 80 % precipitation probability, confirm run durations are halved.",
+   "up": [
+    {
+     "id": "SIC-SW-006",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-07",
+   "kind": "Test case",
+   "name": "Leak shutdown timing",
+   "text": "Inject 40 % excess flow for 60 s, confirm all valves close within 2 s and an alert is raised.",
+   "up": [
+    {
+     "id": "SIC-SW-008",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-08",
+   "kind": "Test case",
+   "name": "App stop command",
+   "text": "Send stop from the app during a run, confirm the valve closes within 1 s.",
+   "up": [
+    {
+     "id": "SIC-SW-009",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-09",
+   "kind": "Test case",
+   "name": "Manual button run",
+   "text": "Press the button, confirm 5 min run; press again, confirm the run stops.",
+   "up": [
+    {
+     "id": "SIC-SW-010",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-10",
+   "kind": "Test case",
+   "name": "Zone limit",
+   "text": "Configure zone 9, confirm the configuration is rejected.",
+   "up": [
+    {
+     "id": "SIC-SW-011",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "TC-11",
+   "kind": "Test case",
+   "name": "Alert notification content",
+   "text": "Trigger a leak alert, check the notification carries zone and time.",
+   "up": [
+    {
+     "id": "SIC-SW-012",
+     "rel": "verifies"
+    }
+   ],
+   "down": []
+  },
+  {
+   "id": "JIRA:E1",
+   "kind": "Work item (Epic)",
+   "name": "Rain-aware watering",
+   "text": "Reduce watering when rain is forecast, so that the customer saves water without touching the schedule.",
+   "up": [
+    {
+     "id": "SIC-SYS-003",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "In Progress",
+   "component": "Weather Client",
+   "key": null
+  },
+  {
+   "id": "JIRA:E2",
+   "kind": "Work item (Epic)",
+   "name": "Leak protection",
+   "text": "Detect a burst pipe or a stuck valve from the flow measurement and shut the water off. Required for the WaterWise rebate listing of Release 1.1; the program audit in November needs the trace from requirement to test evidence.",
+   "up": [
+    {
+     "id": "SIC-SYS-004",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "To Do",
+   "component": "Flow Guard",
+   "key": null
+  },
+  {
+   "id": "JIRA:S1",
+   "kind": "Work item (Story)",
+   "name": "Fetch the 24-hour forecast from the weather service",
+   "text": "As the scheduler I need the precipitation probability for the next 24 hours, refreshed every 6 hours, with a fallback to the last good forecast.",
+   "up": [
+    {
+     "id": "SIC-SW-005",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "Done",
+   "component": "Weather Client",
+   "key": null
+  },
+  {
+   "id": "JIRA:S2",
+   "kind": "Work item (Story)",
+   "name": "Reduce zone run time when rain is likely",
+   "text": "Apply the rain factor to every scheduled run while the precipitation probability is above 70 %.",
+   "up": [
+    {
+     "id": "SIC-SW-006",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "In Progress",
+   "component": "Scheduler",
+   "key": null
+  },
+  {
+   "id": "JIRA:S3",
+   "kind": "Work item (Story)",
+   "name": "Compute the expected flow per zone",
+   "text": "Derive the expected flow from the zone calibration and compare it with the flow meter reading once a second.",
+   "up": [
+    {
+     "id": "SIC-SW-007",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "Done",
+   "component": "Flow Guard",
+   "key": null
+  },
+  {
+   "id": "JIRA:S4",
+   "kind": "Work item (Story)",
+   "name": "Close all valves and alert on a leak",
+   "text": "When the excess flow condition holds for 60 s, close every valve within 2 s and raise the leak alert.",
+   "up": [
+    {
+     "id": "SIC-SW-008",
+     "rel": "covers"
+    },
+    {
+     "id": "SIC-SW-012",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "To Do",
+   "component": "Zone Controller",
+   "key": null
+  },
+  {
+   "id": "JIRA:S5",
+   "kind": "Work item (Story)",
+   "name": "Persist schedules in non-volatile memory",
+   "text": "Store schedules, thresholds and zone configuration in flash and reload them at start-up.",
+   "up": [
+    {
+     "id": "SIC-SW-001",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "Done",
+   "component": "Config Store",
+   "key": null
+  },
+  {
+   "id": "JIRA:S6",
+   "kind": "Work item (Story)",
+   "name": "Run a zone from the manual button",
+   "text": "A press runs the selected zone for 5 minutes; a second press stops it.",
+   "up": [
+    {
+     "id": "SIC-SW-010",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "Done",
+   "component": "Manual Control",
+   "key": null
+  },
+  {
+   "id": "JIRA:S7",
+   "kind": "Work item (Story)",
+   "name": "Send a push notification for alerts",
+   "text": "Every leak alert produces a push notification with the zone number and the time of the event.",
+   "up": [
+    {
+     "id": "SIC-SW-012",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "To Do",
+   "component": "Notification Service",
+   "key": null
+  },
+  {
+   "id": "JIRA:S8",
+   "kind": "Work item (Story)",
+   "name": "Reject zone numbers above the limit",
+   "text": "Zone configuration above the supported count must be refused with an error. Note: the requirement ID in this story is wrong on purpose; Reqtify reports it as an unresolved reference.",
+   "up": [],
+   "down": [],
+   "status": "Done",
+   "component": "Config Store",
+   "key": null
+  },
+  {
+   "id": "JIRA:B1",
+   "kind": "Work item (Bug)",
+   "name": "Moisture skip rule ignores the per-zone threshold",
+   "text": "The skip decision always uses the global default of 60 % even when a zone has its own threshold.",
+   "up": [
+    {
+     "id": "SIC-SW-004",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "To Do",
+   "component": "Moisture Monitor",
+   "key": null
+  },
+  {
+   "id": "JIRA:B2",
+   "kind": "Work item (Bug)",
+   "name": "Valve stays open after a stop command from the app",
+   "text": "Stop sent from the mobile application during a scheduled run is acknowledged but the valve closes only at the scheduled end.",
+   "up": [
+    {
+     "id": "SIC-SW-009",
+     "rel": "covers"
+    },
+    {
+     "id": "SIC-SW-002",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "In Progress",
+   "component": "App Gateway",
+   "key": null
+  },
+  {
+   "id": "JIRA:B3",
+   "kind": "Work item (Bug)",
+   "name": "Weather fetch retries endlessly when offline",
+   "text": "Without network the client retries every second and starves the scheduler task.",
+   "up": [
+    {
+     "id": "SIC-SW-005",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "Done",
+   "component": "Weather Client",
+   "key": null
+  },
+  {
+   "id": "JIRA:T1",
+   "kind": "Work item (Task)",
+   "name": "Regression test the leak shutdown timing",
+   "text": "Re-run the leak shutdown test on the release candidate and attach the timing log.",
+   "up": [
+    {
+     "id": "SIC-SW-008",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "To Do",
+   "component": "Flow Guard",
+   "key": null
+  },
+  {
+   "id": "JIRA:T2",
+   "kind": "Work item (Task)",
+   "name": "Update the weather service interface description to v2",
+   "text": "The weather provider moves to API v2 in December. Document the new endpoint and fields. No requirement reference on purpose: Reqtify lists this work item as not traced.",
+   "up": [],
+   "down": [],
+   "status": "To Do",
+   "component": "Weather Client",
+   "key": null
+  },
+  {
+   "id": "JIRA:T3",
+   "kind": "Work item (Task)",
+   "name": "Change request: raise the leak detection threshold from 30 % to 40 %",
+   "text": "Support ticket cluster INC-2041 (September 2026): 23 installations with long drip zones reported false leak alerts; pressure build-up on zone start exceeds the 30 % margin for more than 60 s. Product management proposes 40 %. Before approval we need the impact on the system requirement, the software requirements, the Flow Guard block and the leak tests, and the regression scope for Release 1.1.",
+   "up": [
+    {
+     "id": "SIC-SYS-004",
+     "rel": "covers"
+    },
+    {
+     "id": "SIC-SW-007",
+     "rel": "covers"
+    },
+    {
+     "id": "SIC-SW-008",
+     "rel": "covers"
+    }
+   ],
+   "down": [],
+   "status": "To Do",
+   "component": "Flow Guard",
+   "key": null
+  }
+ ]
+}
